@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { openModal } from "./../store/actions/modal";
 
 const QuestionCard = ({
   questionId,
@@ -7,8 +9,9 @@ const QuestionCard = ({
   userImage,
   questionTitle,
   questionTags,
-  onInfoClicked,
 }) => {
+  const dispatch = useDispatch();
+
   return (
     <Card className="my-3 rounded">
       <Row>
@@ -29,7 +32,10 @@ const QuestionCard = ({
 
             <Card.Text>{questionTags.join(", ")}</Card.Text>
 
-            <Button variant="primary" onClick={() => onInfoClicked(questionId)}>
+            <Button
+              variant="primary"
+              onClick={() => dispatch(openModal(questionId))}
+            >
               Know more
             </Button>
           </Card.Body>

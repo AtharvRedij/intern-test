@@ -1,16 +1,20 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from "./../store/actions/modal";
 
 const QuestionModal = ({
-  handleClose,
   questionTitle,
   userName,
   isAnswered,
   questionUrl,
-  showModal,
 }) => {
+  const dispatch = useDispatch();
+
+  const { questionId } = useSelector((state) => state.modal);
+
   return (
-    <Modal show={showModal} onHide={handleClose}>
+    <Modal show={Boolean(questionId)} onHide={() => dispatch(closeModal())}>
       <Modal.Header closeButton>
         <Modal.Title>{questionTitle}</Modal.Title>
       </Modal.Header>
@@ -20,7 +24,7 @@ const QuestionModal = ({
         {`Question is ${!isAnswered ? "not" : ""} answerd`}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handleClose}>
+        <Button variant="primary" onClick={() => dispatch(closeModal())}>
           Close
         </Button>
         <Button variant="secondary">
