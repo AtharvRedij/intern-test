@@ -24,7 +24,7 @@ const QuestionModal = ({
           Close
         </Button>
         <Button variant="secondary">
-          <a href={questionUrl} target="_blank">
+          <a href={questionUrl} target="_blank" rel="noopener noreferrer">
             Go to Stackoverflow
           </a>
         </Button>

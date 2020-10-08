@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Container } from "react-bootstrap";
+import Message from "./components/Message";
+import Loader from "./components/Loader";
 import QuestionCard from "./components/QuestionCard";
 import QuestionModal from "./components/QuestionModal";
-
-const API_URL =
-  "https://api.stackexchange.com/2.2/questions?order=desc&sort=hot&site=stackoverflow";
+import { listQuestions } from "./store/actions/questions";
 
 const App = () => {
-  // All questions from API
-  const [questions, setQuestions] = useState([]);
+  const dispatch = useDispatch();
+
+  const questionsList = useSelector((state) => state.questionsList);
+
+  const { loading, error, questions } = questionsList;
+
+  useEffect(() => {
+    dispatch(listQuestions());
+  }, [dispatch]);
 
   // selected question from 'Know more'
   const [question, setQuestion] = useState({});
 
   // modal show/hide
   const [showModal, setShowModal] = useState(false);
-
-  // fetches data
-  useEffect(() => {
-    const getQuestions = async () => {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      setQuestions(data.items);
-    };
-
-    getQuestions();
-  }, []);
 
   // handler for 'know more' btn click
   const handleInfoClicked = (questionId) => {
@@ -38,30 +35,38 @@ const App = () => {
 
   return (
     <Container className=" justify-content-md-center">
-      {/* modal */}
-      {showModal && (
-        <QuestionModal
-          showModal={showModal}
-          handleClose={() => setShowModal(false)}
-          questionTitle={question.title}
-          userName={question.owner.display_name}
-          isAnswered={question.is_answered}
-          questionUrl={question.link}
-        />
-      )}
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Message variant="danger">{error}</Message>
+      ) : (
+        <>
+          {/* modal */}
+          {showModal && (
+            <QuestionModal
+              showModal={showModal}
+              handleClose={() => setShowModal(false)}
+              questionTitle={question.title}
+              userName={question.owner.display_name}
+              isAnswered={question.is_answered}
+              questionUrl={question.link}
+            />
+          )}
 
-      {/* All questions */}
-      {questions.map((question) => (
-        <QuestionCard
-          key={question.question_id}
-          questionId={question.question_id}
-          userName={question.owner.display_name}
-          userImage={question.owner.profile_image}
-          questionTitle={question.title}
-          questionTags={question.tags}
-          onInfoClicked={handleInfoClicked}
-        />
-      ))}
+          {/* All questions */}
+          {questions.map((question) => (
+            <QuestionCard
+              key={question.question_id}
+              questionId={question.question_id}
+              userName={question.owner.display_name}
+              userImage={question.owner.profile_image}
+              questionTitle={question.title}
+              questionTags={question.tags}
+              onInfoClicked={handleInfoClicked}
+            />
+          ))}
+        </>
+      )}
     </Container>
   );
 };
