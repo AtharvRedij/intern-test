@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Row, Col, Button } from "react-bootstrap";
+import { Card, Row, Col, Button, Badge } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { openModal } from "./../store/actions/modal";
 
@@ -30,7 +30,13 @@ const QuestionCard = ({
           <Card.Body>
             <Card.Title>{questionTitle}</Card.Title>
 
-            <Card.Text>{questionTags.join(", ")}</Card.Text>
+            <Card.Text>
+              {questionTags.map((tag) => (
+                <Badge className="mx-1 p-2" variant="info" pill key={tag}>
+                  {tag}
+                </Badge>
+              ))}
+            </Card.Text>
 
             <Button
               variant="primary"
