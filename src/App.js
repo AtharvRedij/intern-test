@@ -1,60 +1,37 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import Message from "./components/Message";
-import Loader from "./components/Loader";
-import QuestionCard from "./components/QuestionCard";
-import QuestionModal from "./components/QuestionModal";
-import { listQuestions } from "./store/actions/questions";
+import UserProfile from "./pages/UserProfile";
+import OrderSummary from "./pages/OrderSummary";
+import Header from "./components/Header";
+
+const API_URL = "https://indapi.kumba.io/webdev/assignment";
 
 const App = () => {
-  const dispatch = useDispatch();
-
-  // data from redux store
-  const { questionId } = useSelector((state) => state.modal);
-  const questionsList = useSelector((state) => state.questionsList);
-
-  // data for UI
-  const { loading, error, questions } = questionsList;
-
-  const question = questions.find(
-    (question) => question.question_id === questionId
-  );
+  const [page, setPage] = useState("profile");
+  const [user, setUser] = useState({});
+  const [restaurant, setRestaurant] = useState({});
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
-    dispatch(listQuestions());
-  }, [dispatch]);
+    const getData = async () => {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      setUser(data.user);
+      setRestaurant(data.restaurant);
+      setItems(data.items);
+    };
+
+    getData();
+  }, []);
 
   return (
-    <Container className=" justify-content-md-center">
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <Message variant="danger">{error}</Message>
+    <Container>
+      <Header page={page} setPage={setPage} />
+      {page === "profile" ? (
+        <UserProfile user={user} />
       ) : (
-        <>
-          {/* modal */}
-          {questionId && (
-            <QuestionModal
-              questionTitle={question.title}
-              userName={question.owner.display_name}
-              isAnswered={question.is_answered}
-              questionUrl={question.link}
-            />
-          )}
-
-          {/* All questions */}
-          {questions.map((question) => (
-            <QuestionCard
-              key={question.question_id}
-              questionId={question.question_id}
-              userName={question.owner.display_name}
-              userImage={question.owner.profile_image}
-              questionTitle={question.title}
-              questionTags={question.tags}
-            />
-          ))}
-        </>
+        <OrderSummary restaurant={restaurant} items={items} />
       )}
     </Container>
   );
